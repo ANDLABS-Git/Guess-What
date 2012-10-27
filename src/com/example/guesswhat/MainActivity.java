@@ -25,4 +25,9 @@ public class MainActivity extends Activity {
     	startActivity(new Intent(this,Level1.class));
     }
     
+    public void level2(View v){
+    	startActivity(new Intent(this,Level2.class));
+    }
+    
+    
 }

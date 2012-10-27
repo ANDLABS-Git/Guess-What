@@ -42,7 +42,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.immersion.uhl.Launcher;
 
-public class Level1 extends SimpleBaseGameActivity implements
+public class Level2 extends SimpleBaseGameActivity implements
 		IOnSceneTouchListener {
 
 	private static final float CAMERA_WIDTH = 480;
@@ -92,6 +92,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 	@Override
 	public Scene onCreateScene() {
+		
+		Log.i("contact","start ----");
 		Scene scene = new Scene();
 		scene.setOnSceneTouchListener(this);
 
@@ -122,40 +124,150 @@ public class Level1 extends SimpleBaseGameActivity implements
 			@Override
 			public void beginContact(Contact contact) {
 //				if(!mOnSurface) {
-					m_launcher.play(Launcher.TICK_100);
-//					mOnSurface = true; 
+					
+//					Rectangle a =  (Rectangle) contact.getFixtureA().getBody().getUserData();
+//					Rectangle b =  (Rectangle) contact.getFixtureB().getBody().getUserData();
+					
+					String aa =  (String) contact.getFixtureA().getBody().getUserData();
+					String bb =  (String) contact.getFixtureB().getBody().getUserData();
+					
+					
+//					Log.i("contact",a.getUserData()+":"+a.getX()+":"+a.getY()+"   -   "+b.getUserData()+":"+b.getX()+":"+b.getY()); // + "  ## "+aa + " == " + bb );
+					
+					if(!aa.equalsIgnoreCase("pointer")){
+						if(aa.equalsIgnoreCase("A")){
+							m_launcher.play(Launcher.TRIPLE_STRONG_CLICK_100);
+						}else if(aa.equalsIgnoreCase("B")){
+							m_launcher.play(Launcher.FAST_PULSE_33);
+						}if(aa.equalsIgnoreCase("C")){
+							m_launcher.play(Launcher.DOUBLE_SHARP_CLICK_66);
+						}
+					}
+//					
+//					
 //				} 
 //				m_launcher.play(Launcher.TEXTURE6);
 			}
 		});
+		
+		
+	
+		
+		Rectangle colorA= new Rectangle(0, 0, CAMERA_WIDTH/3, 100, getVertexBufferObjectManager());
+		colorA.setColor(Color.GREEN);
+		Rectangle colorB= new Rectangle(CAMERA_WIDTH/3,0 , CAMERA_WIDTH/3, 100, getVertexBufferObjectManager());
+		colorB.setColor(Color.BLUE);
+		Rectangle colorC= new Rectangle(CAMERA_WIDTH/3*2,0 , CAMERA_WIDTH/3, 100, getVertexBufferObjectManager());
+		colorC.setColor(Color.RED);
+		
+		colorA.setUserData("L");
+		colorB.setUserData("B");
+		colorC.setUserData("C");
 
-		Sprite blackstar = new Sprite(CAMERA_WIDTH / 2 - mStarBlack.getWidth()
-				/ 2, CAMERA_HEIGHT / 2 - mStarBlack.getHeight() / 2 - 80,
-				mStarBlack, getVertexBufferObjectManager());
-		scene.attachChild(blackstar);
+		
+		
+		scene.attachChild(colorA);
+		scene.attachChild(colorB);
+		scene.attachChild(colorC);
+		
+		Body a= 	PhysicsFactory.createBoxBody(mPhysicsWorld, colorA, BodyType.StaticBody, mFixtureDef);
+		Body c= 	PhysicsFactory.createBoxBody(mPhysicsWorld, colorB, BodyType.StaticBody, mFixtureDef);
+		Body b= 	PhysicsFactory.createBoxBody(mPhysicsWorld, colorC, BodyType.StaticBody, mFixtureDef);
+		
+//		a.setUserData(colorA);
+//		b.setUserData(colorB);
+//		c.setUserData(colorC);
+		
+		a.setUserData("A");
+		b.setUserData("B");
+		c.setUserData("C");
 
-		Sprite arrow = new Sprite(0, CAMERA_HEIGHT - mArrow.getHeight()+50,
+		mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				colorA, a, true, true));
+		
+		mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				colorB, b, true, true));	
+		mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+						colorC, c, true, true));
+		
+		
+		Rectangle shape1a= new Rectangle(50, 650,50,40, getVertexBufferObjectManager());
+		shape1a.setColor(Color.GREEN);
+		scene.attachChild(shape1a);
+		shape1a.setColor(Color.RED);
+		
+		Rectangle shape2a= new Rectangle(200, 650, 50,40, getVertexBufferObjectManager());
+		shape2a.setColor(Color.GREEN);
+		scene.attachChild(shape2a);
+		
+		Rectangle shape3a= new Rectangle(350, 650, 50,50, getVertexBufferObjectManager());
+		shape3a.setColor(Color.GREEN);
+		scene.attachChild(shape3a);
+		
+
+		Sprite arrowTarget = new Sprite(270, 280,
 				mArrow, getVertexBufferObjectManager());
-		arrow.setSize(CAMERA_WIDTH / 3 - 10, CAMERA_WIDTH / 3 - 10);
+		scene.attachChild(arrowTarget);
+		arrowTarget.setScale(2);
+		arrowTarget.setColor(Color.BLUE);
+		
+
+		Rectangle arrowTargetB= new Rectangle(50, 275, 175,170, getVertexBufferObjectManager());
+		arrowTargetB.setColor(Color.RED);
+		scene.attachChild(arrowTargetB);
+		
+		Body bodyarrowTarget= 	PhysicsFactory.createBoxBody(mPhysicsWorld, arrowTarget, BodyType.StaticBody, mFixtureDef);
+		Body bodyarrowTargetB= 	PhysicsFactory.createBoxBody(mPhysicsWorld, arrowTargetB, BodyType.StaticBody, mFixtureDef);
+		
+		bodyarrowTarget.setUserData("A");
+		bodyarrowTargetB.setUserData("C");
+
+		mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				arrowTarget, bodyarrowTarget, true, true));
+		mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				arrowTarget, bodyarrowTargetB, true, true));
+		
+		
+		Sprite arrow = new Sprite(72, 595,
+				mArrow, getVertexBufferObjectManager());
 		scene.attachChild(arrow);
+		arrow.setScale(0.5f);
+		arrow.setColor(Color.BLUE);
+		
+		Sprite arrow2 = new Sprite(222, 595,
+				mArrow, getVertexBufferObjectManager());
+		scene.attachChild(arrow2);
+		arrow2.setScale(0.5f);
+		arrow2.setColor(Color.RED);
+		
+		Sprite arrow3 = new Sprite(327, 555,
+				mArrow, getVertexBufferObjectManager());
+		scene.attachChild(arrow3);
+		arrow3.setScale(0.5f);
+		arrow3.setRotation(-90);
+		arrow3.setColor(Color.BLUE);
+		
+		
+		
+		
+//
+//		Sprite bubble = new Sprite(CAMERA_WIDTH / 3, CAMERA_HEIGHT
+//				- mBubble.getHeight(), mBubble, getVertexBufferObjectManager());
+//		bubble.setSize(CAMERA_WIDTH / 3 - 10, CAMERA_WIDTH / 3 - 10);
+//		scene.attachChild(bubble);
+//
+//		Sprite star = new Sprite(CAMERA_WIDTH / 3 * 2, CAMERA_HEIGHT
+//				- mStar.getHeight()+80, mStar, getVertexBufferObjectManager());
+//		star.setSize(CAMERA_WIDTH / 3 - 10, CAMERA_WIDTH / 3 - 10);
+//		scene.attachChild(star);
 
-		Sprite bubble = new Sprite(CAMERA_WIDTH / 3, CAMERA_HEIGHT
-				- mBubble.getHeight(), mBubble, getVertexBufferObjectManager());
-		bubble.setSize(CAMERA_WIDTH / 3 - 10, CAMERA_WIDTH / 3 - 10);
-		scene.attachChild(bubble);
-
-		Sprite star = new Sprite(CAMERA_WIDTH / 3 * 2, CAMERA_HEIGHT
-				- mStar.getHeight()+80, mStar, getVertexBufferObjectManager());
-		star.setSize(CAMERA_WIDTH / 3 - 10, CAMERA_WIDTH / 3 - 10);
-		scene.attachChild(star);
-
-		final PhysicsEditorLoader loader = new PhysicsEditorLoader();
-		try {
-			loader.load(this, mPhysicsWorld, "star_black.xml", blackstar, true,
-					true);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		final PhysicsEditorLoader loader = new PhysicsEditorLoader();
+//		try {
+//			loader.load(this, mPhysicsWorld, "star_black.xml", blackstar, true,
+//					true);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		return scene;
 	}
@@ -183,12 +295,14 @@ public class Level1 extends SimpleBaseGameActivity implements
 							(pSceneTouchEvent.getY() - CAMERA_HEIGHT / 2) / 32);
 					body.setTransform(v2, angle);
 					Vector2Pool.recycle(v2);
+					pointer.setUserData("pointer");
 				}
 			} else {
 				pointer = new Rectangle(pSceneTouchEvent.getX(),
 						pSceneTouchEvent.getY(), 1, 1,
 						getVertexBufferObjectManager());
 				pScene.attachChild(pointer);
+				pointer.setUserData("pointer");
 			}
 
 			Body body = PhysicsFactory.createCircleBody(mPhysicsWorld, pointer,
@@ -213,7 +327,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 					PixelFormat.RGBA_8888, TextureOptions.BILINEAR,
 					"bubble.png");
 			this.mArrow = loadResource(this, getTextureManager(),
-					PixelFormat.RGBA_8888, TextureOptions.BILINEAR, "arrow.png");
+					PixelFormat.RGBA_8888, TextureOptions.BILINEAR, "arrowhead.png");
 
 		} catch (IOException e) {
 			e.printStackTrace();
